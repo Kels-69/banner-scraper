@@ -28,11 +28,18 @@ def main():
     args = parser.parse_args()
 
     url = args.url
-    location = args.location
+    location_id = args.location
     headless = args.headless == 'true'
 
+    # Map location ID to country code
+    location_map = {
+        1: 'US', 2: 'UK', 3: 'CA', 4: 'AU', 5: 'DE',
+        6: 'FR', 7: 'JP', 8: 'BR', 9: 'IN', 10: 'SG'
+    }
+    location = location_map[location_id]
+
     print(f"[*] Starting banner scrape for: {url}")
-    print(f"[*] Location: {location} | Headless: {headless}")
+    print(f"[*] Location: {location} ({location_id}) | Headless: {headless}")
     print("=" * 60)
 
     try:

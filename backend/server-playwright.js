@@ -108,26 +108,51 @@ app.post('/api/scrape', async (req, res) => {
   });
 
   pythonProcess.on('close', (code) => {
+    console.log(`[${sessionId}] Process closed with code ${code}`);
+
     if (code === 0) {
       try {
-        // Parse JSON output from the script
-        const jsonMatch = outputBuffer.match(/\{[\s\S]*"homepage"[\s\S]*\}/);
-        if (jsonMatch) {
-          session.results = JSON.parse(jsonMatch[0]);
+        // Find the JSON output (last occurrence of valid JSON object)
+        const lines = outputBuffer.split('\n');
+        let jsonStr = null;
+
+        // Look for JSON starting from the end (most recent output)
+        for (let i = lines.length - 1; i >= 0; i--) {
+          const line = lines[i].trim();
+          if (line.startsWith('{')) {
+            // Try to parse from this line onwards
+            const remainingLines = lines.slice(i).join('\n');
+            try {
+              const parsed = JSON.parse(remainingLines);
+              if (parsed.homepage !== undefined) {
+                jsonStr = remainingLines;
+                break;
+              }
+            } catch (e) {
+              continue;
+            }
+          }
+        }
+
+        if (jsonStr) {
+          session.results = JSON.parse(jsonStr);
           session.status = 'completed';
           console.log(`[${sessionId}] Completed: ${session.results.homepage?.length || 0} homepage + ${session.results.promotions?.length || 0} promo banners`);
         } else {
           session.status = 'error';
-          session.error = 'No results found in output';
+          session.error = 'No valid JSON results found in output';
+          console.error(`[${sessionId}] Output: ${outputBuffer.substring(0, 500)}`);
         }
       } catch (err) {
         session.status = 'error';
         session.error = 'Failed to parse results: ' + err.message;
+        console.error(`[${sessionId}] Parse error:`, err);
       }
     } else {
       session.status = 'error';
-      session.error = errorBuffer || 'Scraping failed';
+      session.error = errorBuffer || `Python script exited with code ${code}`;
       console.error(`[${sessionId}] Failed with code ${code}`);
+      console.error(`[${sessionId}] Error output: ${errorBuffer}`);
     }
   });
 
