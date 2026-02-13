@@ -1,5 +1,10 @@
-// Use relative URL so it works both locally and on Vercel
-const API_URL = window.location.origin + '/api';
+// API URL configuration
+// For split deployment: Set BACKEND_URL to your backend server
+// For same-server deployment: Leave as window.location.origin
+const BACKEND_URL = typeof window.BACKEND_URL !== 'undefined'
+  ? window.BACKEND_URL
+  : window.location.origin;
+const API_URL = BACKEND_URL + '/api';
 
 // DOM Elements
 const urlInput = document.getElementById('urlInput');
