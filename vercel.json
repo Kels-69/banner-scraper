@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "name": "banner-scraper",
+  "builds": [
+    {
+      "src": "backend/server-playwright.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/server-playwright.js"
+    },
+    {
+      "src": "/(.*\\.(css|js|html))",
+      "dest": "/frontend/$1"
+    },
+    {
+      "src": "/",
+      "dest": "backend/server-playwright.js"
+    }
+  ],
+  "env": {
+    "PROXY_HOST": "@proxy_host",
+    "PROXY_PORT": "@proxy_port",
+    "PROXY_USER": "@proxy_user",
+    "PROXY_PASS": "@proxy_pass",
+    "PROXY_SCHEME": "@proxy_scheme"
+  },
+  "functions": {
+    "backend/server-playwright.js": {
+      "maxDuration": 60,
+      "memory": 3008
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "banner-scraper",
+  "version": "1.0.0",
+  "description": "Banner image scraper with Playwright + Oxylabs proxy",
+  "scripts": {
+    "start": "node backend/server-playwright.js",
+    "vercel-build": "pip install -r requirements.txt && playwright install chromium"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.x"
+  }
+}

@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000/api';
+// Use relative URL so it works both locally and on Vercel
+const API_URL = window.location.origin + '/api';
 
 // DOM Elements
 const urlInput = document.getElementById('urlInput');
